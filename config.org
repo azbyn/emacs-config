@@ -1,7 +1,7 @@
 * lexical bindings
 We have to leave this as the first line
   #+begin_src emacs-lisp
-  ;;; -*- lexical-binding: t -*-
+    ;;; -*- lexical-binding: t -*-
   #+end_src
 * Windows mode
   #+begin_src emacs-lisp
