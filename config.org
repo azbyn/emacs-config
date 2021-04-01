@@ -401,11 +401,11 @@ for org mode conversions
 (setq tab-width 4)
 #+END_SRC
 * Terminal and eshell
-** Use fish by default
+** Use zsh by default
 #+BEGIN_SRC emacs-lisp
   (unless azbyn/windows-mode
     (defadvice ansi-term (before force-bash)
-      (interactive (list "/usr/bin/fish")))
+      (interactive (list "/usr/bin/zsh")))
 
     (ad-activate 'ansi-term))
 #+END_SRC
@@ -1372,35 +1372,6 @@ also use =C-n=, =C-p= for movement
         ("<right>" . winner-redo)))
 #+END_SRC
 * flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :config
-    (smartrep-define-key
-        flycheck-mode-map "M-g"
-      '(
-        ("n" . flycheck-next-error)
-        ("p" . flycheck-previous-error)
-
-        ("j" . flycheck-next-error)
-        ("i" . flycheck-previous-error)
-
-        ("<C-j>" . flycheck-next-error)
-        ("<C-i>" . flycheck-previous-error)
-  )))
-
-    (smartrep-define-key
-       global-map "M-g"
-      '(
-        ("n" . next-error)
-        ("p" . previous-error)
-
-        ("j" . next-error)
-        ("i" . previous-error)
-
-        ("<C-j>" . next-error)
-        ("<C-i>" . previous-error)))
-#+END_SRC
 * dropdown-window emacs mode
 #+BEGIN_SRC emacs-lisp
   (unless azbyn/windows-mode
