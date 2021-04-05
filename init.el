@@ -42,17 +42,24 @@
    ["#1d1f21" "#CC342B" "#198844" "#FBA922" "#3971ED" "#A36AC7" "#3971ED" "#c5c8c6"])
  '(default-input-method "azbyn-TeX")
  '(package-selected-packages
-   '(all-the-icons org-html-themes lsp org-wiki julia-mode fsharp-mode haskell-interactive-mode inf-haskell company-auctex auctex lsp-csharp csharp-mode php-mode ob-ipython wucuo clang-format+ irony-eldoc platformio-mode company-arduino arduino-mode lsp-java dap-mode lsp-ui lsp-mode flycheck-java emms mpdel dad-joke haskell-mode fish-completion dumb-jump jedi help-fns+ elpy company-jedi hl-todo nasm-mode company-racer rust-mode zop-to-char anzu htmlize rmsbolt magit smartparens nlinum nlinum-mode smex xterm-color multiple-cursors persp-mode smart-comment ranger fish-mode highlight-escape-sequences highlight-numbers avy lua-mode window-numbering company-dcd find-file-in-project diminish company dashboard expand-region rainbow-mode ivy org-bullets popup-kill-ring rainbow-delimiters which-key use-package base16-theme))
+   '(clang-format all-the-icons org-html-themes lsp org-wiki julia-mode fsharp-mode haskell-interactive-mode inf-haskell company-auctex auctex lsp-csharp csharp-mode php-mode ob-ipython wucuo clang-format+ irony-eldoc platformio-mode company-arduino arduino-mode lsp-java dap-mode lsp-ui lsp-mode flycheck-java emms mpdel dad-joke haskell-mode fish-completion dumb-jump jedi help-fns+ elpy company-jedi hl-todo nasm-mode company-racer rust-mode zop-to-char anzu htmlize rmsbolt magit smartparens nlinum nlinum-mode smex xterm-color multiple-cursors persp-mode smart-comment ranger fish-mode highlight-escape-sequences highlight-numbers avy lua-mode window-numbering company-dcd find-file-in-project diminish company dashboard expand-region rainbow-mode ivy org-bullets popup-kill-ring rainbow-delimiters which-key use-package base16-theme))
  '(winner-mode t)
  '(zop-to-char-prec-keys '(left 1)))
 
+(defconst azbyn/windows-mode (string-equal system-type "windows-nt"))
+(defvar azbyn/height (cond
+                      (azbyn/windows-mode 117)
+                      ((string-equal (system-name) "tadeusz") 100)
+                      (t 107)))
+
+(defvar azbyn/font (if azbyn/windows-mode "Consolas" "DejaVu Sans Mono"))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#1d1f21" :foreground "#c5c8c6" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 107 :width normal :foundry "ADBO" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#1d1f21" :foreground "#c5c8c6" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 100 :width normal :foundry "ADBO" :family "DejaVu Sans Mono"))))
  '(flyspell-duplicate ((t (:underline (:color "#12A59C" :style wave)))))
  '(flyspell-incorrect ((t (:underline (:color "#12A59C" :style wave)))))
  '(font-lock-comment-delimiter-face ((t (:foreground "#969896"))))

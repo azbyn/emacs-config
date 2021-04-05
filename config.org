@@ -5,16 +5,16 @@ We have to leave this as the first line
   #+end_src
 * Windows mode
   #+begin_src emacs-lisp
-    (setq-default azbyn/windows-mode (string-equal system-type "windows-nt"))
+  (setq-default azbyn/windows-mode (string-equal system-type "windows-nt"))
     (when azbyn/windows-mode
       ;; bat file
       ;; set PATH=%PATH%;C:\LegacyApp\Cygwin\3.0.7\bin
       ;; wherever\emacs.exe
 
       ;; comment me and remember to change init.el
-      (setq default-frame-alist
-            (append default-frame-alist '((font . "Consolas")
-                                          (height . 117))))
+      ;;(setq default-frame-alist
+      ;;      (append default-frame-alist '((font . "Consolas")
+      ;;                                    (height . 117))))
       ;; </>
       (setq shell-file-name "cmdproxy.exe")
       (setq w32-pass-lwindow-to-system nil
@@ -1449,8 +1449,11 @@ also use =C-n=, =C-p= for movement
          :config
          (setq lsp-ui-doc-enable nil
                lsp-ui-sideline-enable nil
+               ;; lsp-headerline-breadcrumb-enable t ;eh, keep the top thing
                lsp-ui-flycheck-enable t)
          :after lsp-mode)
+       ;; auto formatting messes stuff up. best disable it
+       (add-hook 'lsp--managed-mode-hook (lambda nil (interactive) (remove-hook 'post-self-insert-hook 'lsp--on-self-insert t)))
        (use-package all-the-icons
          :ensure t)
 
@@ -1459,6 +1462,19 @@ also use =C-n=, =C-p= for movement
          :config
          (dap-mode t)
          (dap-ui-mode t)))
+   #+end_src
+** clang-format
+   #+begin_src emacs-lisp
+     (use-package clang-format
+       :ensure t)
+     (setq-default clang-format-fallback-style "llvm")
+     (defun azbyn/clang-format-region-or-buffer ()
+       (interactive)
+       (if mark-active
+           (call-interactively 'clang-format-region)
+         (clang-format-buffer)))
+
+     (bind-key "<C-M-tab>" 'azbyn/clang-format-region-or-buffer)
    #+end_src
 ** c-style
 #+BEGIN_SRC emacs-lisp
