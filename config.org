@@ -5,16 +5,16 @@ We have to leave this as the first line
   #+end_src
 * Windows mode
   #+begin_src emacs-lisp
-    (setq-default azbyn/windows-mode (string-equal system-type "windows-nt"))
+  (setq-default azbyn/windows-mode (string-equal system-type "windows-nt"))
     (when azbyn/windows-mode
       ;; bat file
       ;; set PATH=%PATH%;C:\LegacyApp\Cygwin\3.0.7\bin
       ;; wherever\emacs.exe
 
       ;; comment me and remember to change init.el
-      (setq default-frame-alist
-            (append default-frame-alist '((font . "Consolas")
-                                          (height . 117))))
+      ;;(setq default-frame-alist
+      ;;      (append default-frame-alist '((font . "Consolas")
+      ;;                                    (height . 117))))
       ;; </>
       (setq shell-file-name "cmdproxy.exe")
       (setq w32-pass-lwindow-to-system nil
@@ -401,11 +401,11 @@ for org mode conversions
 (setq tab-width 4)
 #+END_SRC
 * Terminal and eshell
-** Use fish by default
+** Use zsh by default
 #+BEGIN_SRC emacs-lisp
   (unless azbyn/windows-mode
     (defadvice ansi-term (before force-bash)
-      (interactive (list "/usr/bin/fish")))
+      (interactive (list "/usr/bin/zsh")))
 
     (ad-activate 'ansi-term))
 #+END_SRC
@@ -1373,35 +1373,6 @@ also use =C-n=, =C-p= for movement
         ("<right>" . winner-redo)))
 #+END_SRC
 * flycheck
-#+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :config
-    (smartrep-define-key
-        flycheck-mode-map "M-g"
-      '(
-        ("n" . flycheck-next-error)
-        ("p" . flycheck-previous-error)
-
-        ("j" . flycheck-next-error)
-        ("i" . flycheck-previous-error)
-
-        ("<C-j>" . flycheck-next-error)
-        ("<C-i>" . flycheck-previous-error)
-  )))
-
-    (smartrep-define-key
-       global-map "M-g"
-      '(
-        ("n" . next-error)
-        ("p" . previous-error)
-
-        ("j" . next-error)
-        ("i" . previous-error)
-
-        ("<C-j>" . next-error)
-        ("<C-i>" . previous-error)))
-#+END_SRC
 * dropdown-window emacs mode
 #+BEGIN_SRC emacs-lisp
   (unless azbyn/windows-mode
@@ -1479,8 +1450,11 @@ also use =C-n=, =C-p= for movement
          :config
          (setq lsp-ui-doc-enable nil
                lsp-ui-sideline-enable nil
+               ;; lsp-headerline-breadcrumb-enable t ;eh, keep the top thing
                lsp-ui-flycheck-enable t)
          :after lsp-mode)
+       ;; auto formatting messes stuff up. best disable it
+       (add-hook 'lsp--managed-mode-hook (lambda nil (interactive) (remove-hook 'post-self-insert-hook 'lsp--on-self-insert t)))
        (use-package all-the-icons
          :ensure t)
 
@@ -1489,6 +1463,19 @@ also use =C-n=, =C-p= for movement
          :config
          (dap-mode t)
          (dap-ui-mode t)))
+   #+end_src
+** clang-format
+   #+begin_src emacs-lisp
+     (use-package clang-format
+       :ensure t)
+     (setq-default clang-format-fallback-style "llvm")
+     (defun azbyn/clang-format-region-or-buffer ()
+       (interactive)
+       (if mark-active
+           (call-interactively 'clang-format-region)
+         (clang-format-buffer)))
+
+     (bind-key "<C-M-tab>" 'azbyn/clang-format-region-or-buffer)
    #+end_src
 ** c-style
 #+BEGIN_SRC emacs-lisp

@@ -260,9 +260,9 @@
   (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-projects)
   (define-key 'azbyn/goto-map (kbd "m") 'azbyn/goto-music)
 
-  (defun azbyn/edit-bashrc()     (interactive) (find-file "~/.bashrc"))
+  ;; (defun azbyn/edit-bashrc()     (interactive) (find-file "~/.bashrc"))
   (defun azbyn/edit-xresources() (interactive) (find-file "~/.Xresources"))
-  (defun azbyn/edit-fish()       (interactive) (find-file "~/.config/fish/config.fish"))
+  ;; (defun azbyn/edit-fish()       (interactive) (find-file "~/.config/fish/config.fish"))
   (defun azbyn/edit-zshrc()      (interactive) (find-file "~/.zshrc"))
   (defun azbyn/edit-p10rc()      (interactive) (find-file "~/.p10k.zsh"))
   (defun azbyn/edit-xinit()      (interactive) (find-file "~/.xinitrc"))
@@ -278,8 +278,9 @@
 
   (defun azbyn/dotfile-make()     (interactive) (find-file "~/dotfiles/Makefile"))
 
-  (define-key 'azbyn/edit-map (kbd "b") 'azbyn/edit-bashrc)
-  (define-key 'azbyn/edit-map (kbd "f") 'azbyn/edit-fish)
+  (define-key 'azbyn/edit-map (kbd "b") 'azbyn/goto-bin)
+  ;; (define-key 'azbyn/edit-map (kbd "b") 'azbyn/edit-bashrc)
+  ;; (define-key 'azbyn/edit-map (kbd "f") 'azbyn/edit-fish)
   (define-key 'azbyn/edit-map (kbd "z") 'azbyn/edit-zshrc)
   (define-key 'azbyn/edit-map (kbd "p") 'azbyn/edit-p10rc)
 
@@ -855,7 +856,7 @@
   (global-set-key (kbd ">") 'indent-or->)
 
 #+end_src
-* other bindings
+* other bindings and funcs
 ** repeat
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "H-.") 'repeat)
@@ -935,7 +936,20 @@
 
      (global-set-key (kbd "C-`") 'azbyn/external-open)
    #+end_src
-
+** fixup indentation
+   #+begin_src emacs-lisp
+     (defun azbyn/fixup-indentation ()
+       (interactive)
+       (save-excursion
+         (evil-shift-right (point-min) (point-max))
+         (set-mark (point-min))
+         (goto-char (point-max))
+         (execute-kbd-macro (read-kbd-macro "<tab>"))
+         (delete-trailing-whitespace)
+         ))
+     ;; for f in **/*.java { (progn (find-file f) (azbyn/fixup-indentation)) }
+     (global-set-key (kbd "M-t i") 'azbyn/fixup-indentation)
+   #+end_src
 * compile
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "M-c") 'azbyn/run-make-thing)
