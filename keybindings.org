@@ -161,7 +161,7 @@
   (define-key 'azbyn-key-map (kbd "r") 'revert-buffer)
 
   (define-key 'azbyn-key-map (kbd "u") 'upcase-dwim)
-  (define-key 'azbyn-key-map (kbd "d") 'downcase-dwim)
+  ;;(define-key 'azbyn-key-map (kbd "d") 'downcase-dwim)
   (define-key 'azbyn-key-map (kbd "l") 'downcase-dwim)
 
   (define-key 'azbyn-key-map (kbd "TAB") 'ff-find-other-file)
@@ -361,6 +361,21 @@
   (define-key 'azbyn/input-method-map (kbd "j") 'azbyn/set-input-japanese)
 #+END_SRC
 
+** diff
+  #+begin_src emacs-lisp
+    (use-package vdiff
+      :ensure t)
+    (require 'diff-region)
+
+    (define-prefix-command 'diff-key-map)
+    (define-key 'azbyn-key-map (kbd "d") 'diff-key-map)
+
+    (define-key 'diff-key-map (kbd "a") 'diff-region)
+    (define-key 'diff-key-map (kbd "b") 'diff-region-now)
+    (define-key 'diff-key-map (kbd "d") 'vdiff-buffers)
+    (define-key 'diff-key-map (kbd "f") 'vdiff-files)
+    (define-key 'diff-key-map (kbd "q") 'vdiff-quit)
+  #+end_src
 * weird movement
 ** use C-i C-j for horizontal movement
 #+BEGIN_SRC emacs-lisp
@@ -920,6 +935,7 @@
 
      (global-set-key (kbd "C-`") 'azbyn/external-open)
    #+end_src
+
 * compile
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "M-c") 'azbyn/run-make-thing)
