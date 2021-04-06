@@ -42,7 +42,8 @@ We have to leave this as the first line
   (defconst base16-col-base09 "#F96A38")
   (defconst base16-col-base0A "#FBA922")
   (defconst base16-col-base0B "#198844")
-  (defconst base16-col-base0C "#1296A5")
+  (defconst base16-col-base0C "#3971ED")
+  ;; (defconst base16-col-base0C "#1296A5")
   (defconst base16-col-base0D "#3971ED")
   (defconst base16-col-base0E "#A36AC7")
   (defconst base16-col-base0F "#FBA922")
@@ -76,8 +77,8 @@ We have to leave this as the first line
                       :base09 ,base16-col-base09
                       :base0A ,base16-col-base0A
                       :base0B ,base16-col-base0B
-                      :base0C ,base16-col-base0C ;;:base0C "#318ce7" ;;:base0C "#3971ed"
-                      :base0D ,base16-col-base0D ;;:base0D "#12A59C"
+                      :base0C ,base16-col-base0C
+                      :base0D ,base16-col-base0D
                       :base0E ,base16-col-base0E
                       :base0F ,base16-col-base0F))
       :config
@@ -1648,7 +1649,7 @@ also use =C-n=, =C-p= for movement
   (add-hook 'python-mode-hook 'jedi-mode)
   ;;(add-hook 'python-mode-hook 'jedi:setup)
   (when azbyn/windows-mode
-    (setq python-scripts-path (shell-command-to-string "py -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib().replace(r'Lib\\site-packages', 'Scripts'), end='')\""))
+    (setq python-scripts-path (shell-command-to-string "py -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib().replace(r'Lib\\site-packages', 'Scripts\\\\'), end='')\""))
     ;;(setq python-scripts-path "C:/Users/azbyn/AppData/Local/Programs/Python/Python37/Scripts/")
     (setq python-environment-virtualenv (list (concat python-scripts-path "virtualenv.exe")))
     (setq python-shell-interpreter (concat python-scripts-path "ipython.exe"))
