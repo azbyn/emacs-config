@@ -30,22 +30,33 @@ We have to leave this as the first line
 * Theme
 ** colors
 #+BEGIN_SRC emacs-lisp
-  (setq-default base16-col-base00 "#1d1f21"
-                base16-col-base01 "#282a2e"
-                base16-col-base02 "#373b41"
-                base16-col-base03 "#7E807E"
-                base16-col-base04 "#b4b7b4"
-                base16-col-base05 "#c5c8c6"
-                base16-col-base06 "#e0e0e0"
-                base16-col-base07 "#FFFFFF"
-                base16-col-base08 "#CC342B"
-                base16-col-base09 "#F96A38"
-                base16-col-base0A "#FBA922"
-                base16-col-base0B "#198844"
-                base16-col-base0C "#1296a5"
-                base16-col-base0D "#3971ED"
-                base16-col-base0E "#A36AC7"
-                base16-col-base0F "#FBA922")
+  (defconst base16-col-base00 "#1D1F21")
+  (defconst base16-col-base01 "#282A2E")
+  (defconst base16-col-base02 "#373B41")
+  (defconst base16-col-base03 "#7E807E")
+  (defconst base16-col-base04 "#B4B7B4")
+  (defconst base16-col-base05 "#C5C8C6")
+  (defconst base16-col-base06 "#E0E0E0")
+  (defconst base16-col-base07 "#FFFFFF")
+  (defconst base16-col-base08 "#CC342B")
+  (defconst base16-col-base09 "#F96A38")
+  (defconst base16-col-base0A "#FBA922")
+  (defconst base16-col-base0B "#198844")
+  (defconst base16-col-base0C "#1296A5")
+  (defconst base16-col-base0D "#3971ED")
+  (defconst base16-col-base0E "#A36AC7")
+  (defconst base16-col-base0F "#FBA922")
+
+  (defvaralias 'base16-col-black   'base16-col-base00)
+  (defvaralias 'base16-col-gray    'base16-col-base05)
+  (defvaralias 'base16-col-white   'base16-col-base07)
+  (defvaralias 'base16-col-red     'base16-col-base08)
+  (defvaralias 'base16-col-orange  'base16-col-base09)
+  (defvaralias 'base16-col-yellow  'base16-col-base0A)
+  (defvaralias 'base16-col-green   'base16-col-base0B)
+  (defvaralias 'base16-col-cyan    'base16-col-base0C)
+  (defvaralias 'base16-col-blue    'base16-col-base0D)
+  (defvaralias 'base16-col-magenta 'base16-col-base0E)
 #+END_SRC
 ** the base16 theme
 #+BEGIN_SRC emacs-lisp
@@ -53,22 +64,22 @@ We have to leave this as the first line
       :ensure t
       :init
       (setq-default base16-google-dark-colors
-                    '(:base00 "#1d1f21"
-                      :base01 "#282a2e"
-                      :base02 "#373b41"
-                      :base03 "#7E807E"
-                      :base04 "#b4b7b4"
-                      :base05 "#c5c8c6"
-                      :base06 "#e0e0e0"
-                      :base07 "#FFFFFF"
-                      :base08 "#CC342B"
-                      :base09 "#F96A38"
-                      :base0A "#FBA922"
-                      :base0B "#198844"
-                      :base0C "#3971ed" ;;:base0C "#318ce7" ;;:base0C "#3971ed"
-                      :base0D "#3971ed" ;;:base0D "#12A59C"
-                      :base0E "#A36AC7"
-                      :base0F "#FBA922"))
+                    `(:base00 ,base16-col-base00
+                      :base01 ,base16-col-base01
+                      :base02 ,base16-col-base02
+                      :base03 ,base16-col-base03
+                      :base04 ,base16-col-base04
+                      :base05 ,base16-col-base05
+                      :base06 ,base16-col-base06
+                      :base07 ,base16-col-base07
+                      :base08 ,base16-col-base08
+                      :base09 ,base16-col-base09
+                      :base0A ,base16-col-base0A
+                      :base0B ,base16-col-base0B
+                      :base0C ,base16-col-base0C ;;:base0C "#318ce7" ;;:base0C "#3971ed"
+                      :base0D ,base16-col-base0D ;;:base0D "#12A59C"
+                      :base0E ,base16-col-base0E
+                      :base0F ,base16-col-base0F))
       :config
       (setq-default base16-theme-256-color-source "base16-shell")
       (load-theme 'base16-google-dark t)
@@ -76,7 +87,19 @@ We have to leave this as the first line
         (set-face-background 'default "unspecified-bg" (selected-frame)))
   )
 #+END_SRC
-
+** ansi colors
+   #+begin_src emacs-lisp
+     (setq-default ansi-color-names-vector
+                   (vector base16-col-black
+                           base16-col-red
+                           base16-col-green
+                           base16-col-yellow
+                           base16-col-blue
+                           base16-col-magenta
+                           base16-col-blue ;; looks better than cyan
+                           base16-col-gray
+                           ))
+   #+end_src
 ** highlight numbers
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-numbers
@@ -1372,20 +1395,17 @@ also use =C-n=, =C-p= for movement
         ("<right>" . winner-redo)))
 #+END_SRC
 * flycheck
-* dropdown-window emacs mode
+* server
 #+BEGIN_SRC emacs-lisp
-  (unless azbyn/windows-mode
-    (load "server")
-    (unless (server-running-p) (server-start))
-    ;; (
-    (defun dropdown-mode ()
-      ;;(setq frame-title-format '("QuakeDD_emacs"))
-      ;;(setq frame-title-format "QuakeDD_emacs")
-      ;;(set-frame-parameter nil 'alpha 95)
-
-      ;;(set-face-attribute 'default nil
-      ;;                    :height 117)
-      ))
+  ;; (unless azbyn/windows-mode
+  (load "server")
+  (unless (server-running-p) (server-start))
+#+END_SRC
+* quail stuff
+#+BEGIN_SRC emacs-lisp
+  (require 'russian-transl)
+  (require 'azbyn-tex)
+  (setq-default default-input-method "azbyn-TeX")
 #+END_SRC
 * programming languages config
 ** common
@@ -1436,7 +1456,7 @@ also use =C-n=, =C-p= for movement
          :init
          (setq lsp-prefer-flymake nil)
          :demand t
-         :after jmi-init-platform-pat)
+         :after jmi-init-platform-paths)
        (defun azbyn/lsp-hook ()
          (define-key lsp-mode-map (kbd "<C-return>") 'lsp-execute-code-action)
          (define-key lsp-mode-map (kbd "C-M-g") 'lsp-goto-type-definition);; lsp-execute-code-action)
@@ -1619,8 +1639,8 @@ also use =C-n=, =C-p= for movement
   (add-hook 'python-mode-hook 'jedi-mode)
   ;;(add-hook 'python-mode-hook 'jedi:setup)
   (when azbyn/windows-mode
-    ;; (setq python-scripts-path "C:/LegacyApp/Python36/Scripts/")
-    (setq python-scripts-path "C:/Users/azbyn/AppData/Local/Programs/Python/Python37/Scripts/")
+    (setq python-scripts-path (shell-command-to-string "py -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib().replace(r'Lib\\site-packages', 'Scripts'), end='')\""))
+    ;;(setq python-scripts-path "C:/Users/azbyn/AppData/Local/Programs/Python/Python37/Scripts/")
     (setq python-environment-virtualenv (list (concat python-scripts-path "virtualenv.exe")))
     (setq python-shell-interpreter (concat python-scripts-path "ipython.exe"))
 
@@ -1911,6 +1931,11 @@ also use =C-n=, =C-p= for movement
 
 ** c#
    #+begin_src emacs-lisp
+     ;; having syntax highlighting is enough
+     (when azbyn/windows-mode
+       (use-package csharp-mode
+         :ensure t))
+
      (unless azbyn/windows-mode
        (use-package csharp-mode
          :ensure t)

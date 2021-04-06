@@ -149,8 +149,8 @@
         (progn
           (call-interactively 'eval-region)
           (message "Evaluated region"))
-          (eval-buffer)
-    (message "Evaluated buffer")))
+      (eval-buffer)
+      (message "Evaluated buffer")))
 
 
   (define-key 'azbyn-key-map (kbd "<M-e>") 'azbyn/eval-buffer-or-region)
@@ -318,7 +318,11 @@
     (defun azbyn/edit-todo () (interactive) (find-file "~/todo.org"))
     (define-key 'azbyn-key-map (kbd "M-t") 'azbyn/edit-todo))
 
-  (unless azbyn/windows-mode
+  (if azbyn/windows-mode
+      (progn
+        (defun azbyn/edit-misc () (interactive)
+               (find-file (format "C:/Users/%s/Desktop/misc.org" user-login-name)))
+        (define-key 'azbyn-key-map (kbd "M-f") 'azbyn/edit-misc))
     (defun azbyn/edit-food () (interactive) (find-file "~/food.org"))
     (define-key 'azbyn-key-map (kbd "M-f") 'azbyn/edit-food))
 
@@ -864,13 +868,18 @@
 ** zop-up-to-char
 #+BEGIN_SRC emacs-lisp
 
-  ;  (global-set-key (kbd "C-z") 'zap-up-to-char)
   (use-package zop-to-char
     :ensure t
     :config
-    (global-set-key [remap zap-up-to-char] 'zop-up-to-char)
+    (global-set-key (kbd "C-z") 'zop-up-to-char)
+    ;; (global-set-key [remap zap-up-to-char] 'zop-up-to-char)
     (setq zop-to-char-copy-keys '(?\C-l))
+    (setq zop-to-char-kill-keys '(?\C-k))
+    (setq zop-to-char-quit-at-point-keys '(?\C-g ?\e ?\r))
+    (setq zop-to-char-quit-at-pos-keys '(?\C-q))
     (setq zop-to-char-delete-keys '(?\C-d))
+    (setq zop-to-char-prec-keys '(left));; I've no idea how to use [C-a] here
+    ;; (setq zop-to-char-next-keys '(right ?\C-f))
     )
 #+END_SRC
 ** find-char
@@ -1126,8 +1135,4 @@
   (global-set-key (kbd "C-o") (lambda () (interactive)
       (other-window -1)))
 #+END_SRC
-* quail stuff
-#+BEGIN_SRC emacs-lisp
-  (require 'russian-transl)
-  (require 'azbyn-tex)
-#+END_SRC
+
