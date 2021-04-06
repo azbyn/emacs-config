@@ -644,6 +644,9 @@
 
   (azbyn/bind-key "C-x <C-e>" (azbyn/get-og-key "C-x C-e"))
 
+  ;; "C-x e" as kmacro-end-and-call-macro  is annoying
+  (azbyn/bind-key "C-x e" (azbyn/get-og-key "C-x C-e"))
+
   (azbyn/bind-key "C-q" (azbyn/get-og-key "C-a"))
   (azbyn/bind-key "C-r" (azbyn/get-og-key "C-e"))
 
