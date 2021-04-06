@@ -996,7 +996,8 @@
 ** disable the binding in org mode and magit
 #+BEGIN_SRC emacs-lisp
   (define-key org-mode-map (kbd "<C-tab>") nil)
-  (define-key magit-status-mode-map (kbd "<C-tab>") nil)
+  (when (boundp 'magit-status-mode-map)
+    (define-key magit-status-mode-map (kbd "<C-tab>") nil))
 #+END_SRC
 
 ** =%=, =*=, =#= and other things

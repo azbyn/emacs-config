@@ -123,7 +123,34 @@ We have to leave this as the first line
   :ensure t)
 (global-hl-todo-mode)
 #+END_SRC
+* diminish
+#+BEGIN_SRC emacs-lisp
+  (use-package diminish
+    :ensure t
+    :config
+    (diminish 'whitespace-mode)
+    (diminish 'flyspell-mode)
+    (diminish 'yas-minor-mode)
+    (diminish 'yas-mode)
+    (diminish 'eldoc-mode)
+    (diminish 'hs-minor-mode)
+    (diminish 'flyspell-mode "s")
+    (diminish 'flymake-mode "fm")
+    (diminish 'wucuo-mode "wu")
+    (diminish 'flycheck-mode "fc")
+    (diminish 'defining-kbd-macro "Macro"))
+#+END_SRC
 * Basic packages
+** yasnippet
+   #+begin_src emacs-lisp
+   (use-package yasnippet
+     :ensure t)
+   #+end_src
+** flycheck-mode
+   #+begin_src emacs-lisp
+   (use-package flycheck
+     :ensure t)
+   #+end_src
 ** which-key
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
@@ -629,28 +656,11 @@ for org mode conversions
   ;(setq column-number-mode t
 #+END_SRC
 
-* diminish
-#+BEGIN_SRC emacs-lisp
-  (use-package diminish
-    :ensure t
-    :config
-    (diminish 'whitespace-mode)
-    (diminish 'flyspell-mode)
-    (diminish 'yas-minor-mode)
-    (diminish 'yas-mode)
-    (diminish 'eldoc-mode)
-    (diminish 'hs-minor-mode)
-    (diminish 'flyspell-mode "s")
-    (diminish 'flymake-mode "fm")
-    (diminish 'wucuo-mode "wu")
-    (diminish 'flycheck-mode "fc")
-    (diminish 'defining-kbd-macro "Macro"))
-#+END_SRC
 * magit
 #+BEGIN_SRC emacs-lisp
-  (unless azbyn/windows-mode
-    (use-package magit
-      :ensure t))
+ (unless azbyn/windows-mode
+  (use-package magit
+    :ensure t))
 #+END_SRC
 * neotree
 #+BEGIN_SRC emacs-lisp
@@ -1394,7 +1404,6 @@ also use =C-n=, =C-p= for movement
       '(("<left>" . winner-undo)
         ("<right>" . winner-redo)))
 #+END_SRC
-* flycheck
 * server
 #+BEGIN_SRC emacs-lisp
   ;; (unless azbyn/windows-mode
@@ -1933,8 +1942,9 @@ also use =C-n=, =C-p= for movement
    #+begin_src emacs-lisp
      ;; having syntax highlighting is enough
      (when azbyn/windows-mode
-       (use-package csharp-mode
-         :ensure t))
+       (when (>= emacs-major-version 26)
+         (use-package csharp-mode
+           :ensure t)))
 
      (unless azbyn/windows-mode
        (use-package csharp-mode
