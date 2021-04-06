@@ -1326,7 +1326,6 @@ I don't really want to use vim mode ever, so i bind the switch to something hard
 #+BEGIN_SRC emacs-lisp
   (evil-mode 1)
 #+END_SRC
-
 * company mode
 also use =C-n=, =C-p= for movement
 #+BEGIN_SRC emacs-lisp
@@ -2081,6 +2080,4 @@ also use =C-n=, =C-p= for movement
       (setq webkit-dark-mode t)
       (modify-frame-parameters nil '((inhibit-double-buffering . t))))
   #+end_src
-* TODO
-fix compile
 

@@ -1,0 +1,9 @@
+lisp/emacs-webkit
+*
+!.gitignore
+!init.el
+!lisp/*
+!lisp
+!snippets
+!*.org
+!README.*
