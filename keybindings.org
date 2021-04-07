@@ -677,9 +677,10 @@
 
 
   (azbyn/bind-key "M-f" 'fill-key-map)
+  ;;not really about fill, but related
+  (azbyn/bind-key "M-f M-t" 'toggle-truncate-lines)
+  (azbyn/bind-key "M-f t" 'toggle-truncate-lines)
   (azbyn/bind-key "<M-a>" 'azbyn-key-map)
-
-
 
   (global-set-key (kbd "C-d") 'azbyn/delete-char-or-region)
   (global-set-key (kbd "M-d") 'azbyn/kill-word)
