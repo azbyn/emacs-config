@@ -19,7 +19,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (require 'package)
-(package-initialize)
+(when (< emacs-major-version 27) (package-initialize))
+
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
@@ -63,6 +64,6 @@
  '(popup-tip-face ((t (:background "#373B41" :foreground "#e0e0e0"))))
  '(rainbow-delimiters-depth-3-face ((t (:foreground "#FBA922"))))
  '(rainbow-delimiters-depth-5-face ((t (:foreground "#F96A38"))))
- '(rainbow-delimiters-depth-6-face ((t (:foreground "goldenrod2"))))
- '(rainbow-delimiters-depth-9-face ((t (:foreground "saddle brown"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "#EEB422"))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#8B4513"))))
  '(whitespace-trailing ((t (:background "#282A2E" :foreground "#FBA922")))))

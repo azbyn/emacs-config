@@ -173,7 +173,20 @@ We have to leave this as the first line
     :diminish rainbow-mode
     :init
       (add-hook 'org-mode-hook 'rainbow-mode)
-      (add-hook 'emacs-lisp-mode-hook 'rainbow-mode))
+      (add-hook 'emacs-lisp-mode-hook 'rainbow-mode)
+      )
+  ;;only do this for #rrggbb, not #rgb and others
+  ;;I don't care about other more exotic formats
+  (setq rainbow-hexadecimal-colors-font-lock-keywords
+        '(("[^&]\\(#\\(?:[0-9a-fA-F]\\{3\\}\\)\\{2\\}\\)"
+           (1 (rainbow-colorize-itself 1)))))
+  ;;i now what "red" looks like, i don't need it highlighed
+  (setq rainbow-html-colors nil)
+  (setq rainbow-x-colors nil)
+  (setq rainbow-latex-colors nil)
+  (setq rainbow-r-colors nil)
+
+
 #+END_SRC
 ** expand region
 #+BEGIN_SRC emacs-lisp
@@ -1019,10 +1032,19 @@ Repeated invocations toggle between the two most recently open buffers."
         (if (eq 0 (skip-chars-backward " " (- (point) (get-deletion-count 4))))
             (backward-delete-char-untabify 1)
           (delete-region (point) here)))))
+
+  (defun azbyn/backspace ()
+    (interactive)
+    (if mark-active
+        (call-interactively 'kill-region)
+      (call-interactively 'backspace-some)))
   ;;(setq-default indent-tabs-mode t)
-  (add-hook 'prog-mode-hook (lambda ()
-                              (interactive)
-                              (local-set-key [backspace] 'backspace-some)))
+
+  (define-key prog-mode-map (kbd "<backspace>") 'azbyn/backspace)
+
+  ;; (add-hook 'prog-mode-hook (lambda ()
+  ;;                             (interactive)
+  ;;                             (local-set-key [backspace] 'azbyn/backspace)))
   (setq backward-delete-char-untabify-method 'hungry)
   ;(define-key 'multiple-cursors-mode-)
 #+END_SRC
@@ -1735,6 +1757,19 @@ also use =C-n=, =C-p= for movement
        (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
        (setq org-image-actual-width 500))
    #+end_src
+** dumb-c-mode
+   #+begin_src emacs-lisp
+     (defun azbyn/dumb-c-mode ()
+       (let ((c-mode-hook nil))
+         (c-mode)))
+
+     ;;this doesn't really work for some reason
+     (define-derived-mode dumb-c-mode
+       azbyn/dumb-c-mode "Dumb-c"
+       "C without the ide features."
+       ;; (setq-local case-fold-search nil)
+       )
+   #+end_src
 ** c++
 #+BEGIN_SRC emacs-lisp
   (unless azbyn/windows-mode
@@ -1743,9 +1778,6 @@ also use =C-n=, =C-p= for movement
       :ensure t)
     (use-package irony-eldoc
       :ensure t)
-    ;;#define breaks
-    (add-hook 'c-mode-hook (lambda () (rainbow-mode -1)))
-
     ;;i don't like autopairing  for this
     (sp-local-pair '(c-mode c++-mode) "/*" nil :actions :rem)
 
@@ -1915,13 +1947,16 @@ also use =C-n=, =C-p= for movement
    #+end_src
 ** php
    #+begin_src emacs-lisp
-     (unless azbyn/windows-mode
-       (use-package php-mode
-         :ensure t)
-       (defun azbyn/php-hook ()
-         (flycheck-mode)
-         (company-mode))
-       (add-hook 'php-mode-hook 'azbyn/php-hook))
+          (unless azbyn/windows-mode
+            (use-package php-mode
+              :ensure t)
+            (defun azbyn/php-hook ()
+              ;(flycheck-mode)
+              (company-mode)
+              (prettify-symbols-mode -1)
+              (auto-revert-mode -1)
+              )
+            (add-hook 'php-mode-hook 'azbyn/php-hook))
    #+end_src
 ** groovy
    #+begin_src emacs-lisp
