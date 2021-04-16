@@ -163,6 +163,9 @@
       (align-current)))
 
   (define-key 'azbyn-key-map (kbd "a") 'azbyn/align-current-or-region)
+
+  (bind-key  (kbd "<M-a> <RET>") 'org-open-at-point 'org-mode-map)
+
   (define-key 'azbyn-key-map (kbd "q") 'quoted-insert)
   (define-key 'azbyn-key-map (kbd "s") 'eshell)
   (define-key 'azbyn-key-map (kbd "r") 'revert-buffer)
@@ -261,7 +264,7 @@
   (defun azbyn/goto-home()      (interactive) (dired "~"))
 
   (if azbyn/windows-mode
-    (defun azbyn/goto-perforce()  (interactive) (dired "D:/p4v/workspace"))
+      (defun azbyn/goto-perforce()  (interactive) (dired "D:/p4v/workspace"))
     (defun azbyn/goto-projects()  (interactive) (dired "~/Projects")))
   (defun azbyn/goto-music()     (interactive) (dired "~/Music"))
 
@@ -279,7 +282,10 @@
   (define-key 'azbyn/goto-map (kbd "e") 'azbyn/goto-emacs)
   (define-key 'azbyn/goto-map (kbd "g") 'azbyn/goto-git-dir)
   (define-key 'azbyn/goto-map (kbd "h") 'azbyn/goto-home)
-  (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-projects)
+  (if azbyn/windows-mode
+      (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-perforce)
+    (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-projects))
+  
   (define-key 'azbyn/goto-map (kbd "m") 'azbyn/goto-music)
 
   ;; (defun azbyn/edit-bashrc()     (interactive) (find-file "~/.bashrc"))
@@ -535,6 +541,7 @@
   ;;(key-binding "C-a")
 
   (azbyn/bind-key "C-x <C-e>" (azbyn/get-og-key "C-x C-e"))
+  (azbyn/bind-key "C-c <C-e>" (azbyn/get-og-key "C-c C-e"))
 
   ;; "C-x e" as kmacro-end-and-call-macro  is annoying
   (azbyn/bind-key "C-x e" (azbyn/get-og-key "C-x C-e"))
@@ -572,6 +579,16 @@
   ;;not really about fill, but related
   (azbyn/bind-key "M-f M-t" 'toggle-truncate-lines)
   (azbyn/bind-key "M-f t" 'toggle-truncate-lines)
+
+  (azbyn/bind-key "M-f M-w" 'toggle-truncate-lines)
+  (azbyn/bind-key "M-f w" 'toggle-truncate-lines)
+
+  ;; M-f M-t and truncate lines is hard for me to remember
+  (defun azbyn/word-wrap()
+    (interactive)
+    (toggle-truncate-lines))
+
+
   (azbyn/bind-key "<M-a>" 'azbyn-key-map)
 
   (global-set-key (kbd "C-d") 'azbyn/delete-char-or-region)
@@ -682,11 +699,15 @@
 * code folding
   #+begin_src emacs-lisp
     (define-key undo-tree-map (kbd "C-_") nil)
-    
-    (global-set-key (kbd "C-+") 'evil-open-folds) ;; ctrl+shift+=
-    (global-set-key (kbd "C-_") 'evil-close-folds)   ;; ctrl+shift+-
+
     (global-set-key (kbd "C-=") 'evil-open-fold)
+    (global-set-key (kbd "C-+") 'evil-open-fold-rec) ;; ctrl+shift+=
+
+    (global-set-key (kbd "C-M-=") 'evil-open-folds) ;; ctrl+alt+=
+    (global-set-key (kbd "C-M-+") 'evil-open-folds) ;; ctrl+alt+shift+=
+
     (global-set-key (kbd "C--") 'evil-close-fold)
+    (global-set-key (kbd "C-_") 'evil-close-folds)   ;; ctrl+shift+-
   #+end_src
 * < and > to indent when mark is active mode
 #+begin_src emacs-lisp

@@ -723,6 +723,13 @@ system, including many technical ones.  Examples:
  ("\\flqq" ?\«) ("\\\"<" ?\«)
  ("\\frqq" ?\») ("\\\">" ?\»)
 
+ ;;romanian proper diacritics
+ ("\\t" ?ț)
+ ("\\T" ?Ț)
+
+ ("\\s" ?ș)
+ ("\\S" ?Ș)
+
  ("\\-" ?­)   ;; soft hyphen
 
  ("\\textmu" ?µ)
