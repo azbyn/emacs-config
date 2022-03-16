@@ -3,6 +3,7 @@ lisp/emacs-webkit
 !.gitignore
 !init.el
 !lisp/*
+!config/*
 !lisp
 !snippets
 !snippets/**/*

@@ -11,7 +11,7 @@
   (setq file-name-handler-alist startup/file-name-handler-alist))
 
 (defun startup/reset-gc ()
-  (setq gc-cons-threshold 16777216
+  (setq gc-cons-threshold 100000000 ;16777216
         gc-cons-percentage 0.1))
 
 (add-hook 'emacs-startup-hook 'startup/revert-file-name-handler-alist)
@@ -35,20 +35,21 @@
   (when value
     (setq package-selected-packages value)))
 
+(add-to-list 'load-path "~/.emacs.d/config/")
+(require 'config)
+(require 'keybindings)
 
-;;; This is the actual config file. It is omitted if it doesn't exist so emacs won't refuse to launch.
-(when (file-readable-p "~/.emacs.d/config.org")
-  (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
-(when (file-readable-p "~/.emacs.d/keybindings.org")
-  (org-babel-load-file (expand-file-name "~/.emacs.d/keybindings.org")))
+;; (when (file-readable-p "~/.emacs.d/config.el")
+  ;; (load-file (expand-file-name "~/.emacs.d/config.el")))
+;; (when (file-readable-p "~/.emacs.d/keybindings.el")
+  ;; (load-file (expand-file-name "~/.emacs.d/keybindings.el")))
 
-(defconst azbyn/windows-mode (string-equal system-type "windows-nt"))
-(defvar azbyn/height (cond
-                      (azbyn/windows-mode 117)
-                      ((string-equal (system-name) "tadeusz") 100)
-                      (t 107)))
+;; (when (file-readable-p "~/.emacs.d/config.org")
+;;   (org-babel-load-file (expand-file-name "~/.emacs.d/config.org")))
+;; (when (file-readable-p "~/.emacs.d/keybindings.org")
+;;   (org-babel-load-file (expand-file-name "~/.emacs.d/keybindings.org")))
 
-(defvar azbyn/font (if azbyn/windows-mode "Consolas" "DejaVu Sans Mono"))
+
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
