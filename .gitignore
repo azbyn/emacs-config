@@ -2,6 +2,7 @@ lisp/emacs-webkit
 *
 !.gitignore
 !init.el
+!themes/*
 !lisp/*
 !config/
 !config/*

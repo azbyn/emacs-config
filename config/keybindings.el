@@ -3,6 +3,12 @@
 ;; I define them for both `C-c' and hyper because i don't have my hyper key when
 ;; in a terminal
 
+
+;; (require 'config)
+
+(require 'quail)
+(define-key quail-conversion-keymap (kbd "<delete>") nil)
+
 (defun global-set-hyper-key (keyChar func)
   (global-set-key (kbd (concat "C-c " keyChar)) func)
   (global-set-key (kbd (concat "H-" keyChar)) func))
@@ -51,7 +57,7 @@
                               :query nil))
 
 (define-prefix-command 'meta-t-key-map)
-(global-set-key (kbd "M-t") meta-t-key-map)
+(global-set-key (kbd "M-t") 'meta-t-key-map)
 (global-set-key (kbd "M-t r") 'anzu-query-replace-regexp)
 (global-set-key (kbd "M-t C-t") 'anzu-query-replace-regexp)
 (global-set-key (kbd "M-t M-t") 'azbyn/anzu-replace-regexp)
@@ -78,7 +84,7 @@
   (call-interactively azbyn/goto-definition-function))
 (defun azbyn/search-symbol ()
   (interactive)
-  (call-interactively azbyn/goto-symbols-function))
+  (call-interactively 'azbyn/goto-symbols-function))
 (global-set-key (kbd "M-g d") 'azbyn/goto-definition)
 (global-set-key (kbd "M-g q") 'azbyn/goto-quick-bookmark)
 (global-set-key (kbd "M-g s") 'azbyn/search-symbol)
@@ -154,7 +160,7 @@
 
 (define-key 'azbyn-key-map (kbd "<M-a>") 'azbyn/quick-bookmark)
 
-(define-key 'azbyn-key-map (kbd "b") azbyn/bookmarks-map)
+(define-key 'azbyn-key-map (kbd "b") 'azbyn/bookmarks-map)
 
 (define-key 'azbyn/bookmarks-map (kbd "q") 'azbyn/quick-bookmark)
 
@@ -185,6 +191,9 @@
 (define-key 'azbyn-key-map (kbd "i") 'ielm)
 (define-key 'azbyn-key-map (kbd "j") 'evil-join)
 
+(define-key 'azbyn-key-map (kbd "n") 'next-error)
+(define-key 'azbyn-key-map (kbd "p") 'previous-error)
+
 ;; *** goto
 (define-prefix-command 'azbyn/goto-map)
 (define-prefix-command 'azbyn/edit-map)
@@ -192,14 +201,14 @@
 (when azbyn/windows-mode
   (defconst azbyn/desktop (format "C:/Users/%s/Desktop/" user-login-name)))
 
-(define-key 'azbyn-key-map (kbd "g") azbyn/goto-map)
-(define-key 'azbyn-key-map (kbd "e") azbyn/edit-map)
+(define-key 'azbyn-key-map (kbd "g") 'azbyn/goto-map)
+(define-key 'azbyn-key-map (kbd "e") 'azbyn/edit-map)
 
 (defun azbyn/goto-awesome()   (interactive) (dired "~/.config/awesome"))
 (defun azbyn/goto-config()    (interactive) (dired "~/.config"))
 (defun azbyn/goto-bin()       (interactive) (dired "~/bin"))
 (if azbyn/windows-mode
-    (defun azbyn/goto-desktop() (interactive) (dired azbyn/desktop))
+    (defun azbyn/goto-desktop() (interactive) (dired 'azbyn/desktop))
   (defun azbyn/goto-downloads() (interactive) (dired "~/Downloads")))
 
 (defun azbyn/goto-dotfiles()  (interactive) (dired "~/dotfiles"))
@@ -230,51 +239,52 @@
     (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-perforce)
   (define-key 'azbyn/goto-map (kbd "p") 'azbyn/goto-projects))
 
-(define-key 'azbyn/goto-map (kbd "m") 'azbyn/goto-music)
+(unless azbyn/windows-mode
+  (define-key 'azbyn/goto-map (kbd "m") 'azbyn/goto-music)
 
-;; (defun azbyn/edit-bashrc()     (interactive) (find-file "~/.bashrc"))
-(defun azbyn/edit-xresources() (interactive) (find-file "~/.Xresources"))
-;; (defun azbyn/edit-fish()       (interactive) (find-file "~/.config/fish/config.fish"))
-(defun azbyn/edit-zshrc()      (interactive) (find-file "~/.zshrc"))
-(defun azbyn/edit-p10rc()      (interactive) (find-file "~/.p10k.zsh"))
-(defun azbyn/edit-xinit()      (interactive) (find-file "~/.xinitrc"))
-(defun azbyn/edit-xmodmap()    (interactive) (find-file "~/.xmodmaprc"))
-(defun azbyn/edit-ranger()     (interactive) (find-file "~/.config/ranger/rc.conf"))
+  ;; (defun azbyn/edit-bashrc()     (interactive) (find-file "~/.bashrc"))
+  (defun azbyn/edit-xresources() (interactive) (find-file "~/.Xresources"))
+  ;; (defun azbyn/edit-fish()       (interactive) (find-file "~/.config/fish/config.fish"))
+  (defun azbyn/edit-zshrc()      (interactive) (find-file "~/.zshrc"))
+  (defun azbyn/edit-p10rc()      (interactive) (find-file "~/.p10k.zsh"))
+  (defun azbyn/edit-xinit()      (interactive) (find-file "~/.xinitrc"))
+  (defun azbyn/edit-xmodmap()    (interactive) (find-file "~/.xmodmaprc"))
+  (defun azbyn/edit-ranger()     (interactive) (find-file "~/.config/ranger/rc.conf"))
 
-(defun azbyn/edit-awesome-rc()          (interactive) (find-file "~/.config/awesome/rc.lua"))
-(defun azbyn/edit-awesome-keybindings() (interactive) (find-file "~/.config/awesome/keybindings.lua"))
-(defun azbyn/edit-awesome-utils()       (interactive) (find-file "~/.config/awesome/utils.lua"))
-(defun azbyn/edit-awesome-config()      (interactive) (find-file "~/.config/awesome/config.lua"))
-(defun azbyn/edit-awesome-theme()       (interactive) (find-file "~/.config/awesome/theme.lua"))
-(defun azbyn/edit-awesome-widgets()     (interactive) (find-file "~/.config/awesome/widgets/"))
+  (defun azbyn/edit-awesome-rc()          (interactive) (find-file "~/.config/awesome/rc.lua"))
+  (defun azbyn/edit-awesome-keybindings() (interactive) (find-file "~/.config/awesome/keybindings.lua"))
+  (defun azbyn/edit-awesome-utils()       (interactive) (find-file "~/.config/awesome/utils.lua"))
+  (defun azbyn/edit-awesome-config()      (interactive) (find-file "~/.config/awesome/config.lua"))
+  (defun azbyn/edit-awesome-theme()       (interactive) (find-file "~/.config/awesome/theme.lua"))
+  (defun azbyn/edit-awesome-widgets()     (interactive) (find-file "~/.config/awesome/widgets/"))
 
-(defun azbyn/dotfile-make()     (interactive) (find-file "~/dotfiles/Makefile"))
+  (defun azbyn/dotfile-make()     (interactive) (find-file "~/dotfiles/Makefile"))
 
-(define-key 'azbyn/edit-map (kbd "b") 'azbyn/goto-bin)
-;; (define-key 'azbyn/edit-map (kbd "b") 'azbyn/edit-bashrc)
-;; (define-key 'azbyn/edit-map (kbd "f") 'azbyn/edit-fish)
-(define-key 'azbyn/edit-map (kbd "z") 'azbyn/edit-zshrc)
-(define-key 'azbyn/edit-map (kbd "p") 'azbyn/edit-p10rc)
+  (define-key 'azbyn/edit-map (kbd "b") 'azbyn/goto-bin)
+  ;; (define-key 'azbyn/edit-map (kbd "b") 'azbyn/edit-bashrc)
+  ;; (define-key 'azbyn/edit-map (kbd "f") 'azbyn/edit-fish)
+  (define-key 'azbyn/edit-map (kbd "z") 'azbyn/edit-zshrc)
+  (define-key 'azbyn/edit-map (kbd "p") 'azbyn/edit-p10rc)
 
-(define-key 'azbyn/edit-map (kbd "x r") 'azbyn/edit-xresources)
-(define-key 'azbyn/edit-map (kbd "x i") 'azbyn/edit-xinit)
-(define-key 'azbyn/edit-map (kbd "x m") 'azbyn/edit-xmodmap)
+  (define-key 'azbyn/edit-map (kbd "x r") 'azbyn/edit-xresources)
+  (define-key 'azbyn/edit-map (kbd "x i") 'azbyn/edit-xinit)
+  (define-key 'azbyn/edit-map (kbd "x m") 'azbyn/edit-xmodmap)
 
-(define-key 'azbyn/edit-map (kbd "r") 'azbyn/edit-xresources)
-(define-key 'azbyn/edit-map (kbd "i") 'azbyn/edit-xinit)
-(define-key 'azbyn/edit-map (kbd "m") 'azbyn/edit-xmodmap)
+  (define-key 'azbyn/edit-map (kbd "r") 'azbyn/edit-xresources)
+  (define-key 'azbyn/edit-map (kbd "i") 'azbyn/edit-xinit)
+  (define-key 'azbyn/edit-map (kbd "m") 'azbyn/edit-xmodmap)
 
-(define-key 'azbyn/edit-map (kbd "R") 'azbyn/edit-ranger)
+  (define-key 'azbyn/edit-map (kbd "R") 'azbyn/edit-ranger)
 
-(define-key 'azbyn/edit-map (kbd "a r") 'azbyn/edit-awesome-rc)
-(define-key 'azbyn/edit-map (kbd "a k") 'azbyn/edit-awesome-keybindings)
-(define-key 'azbyn/edit-map (kbd "a u") 'azbyn/edit-awesome-utils)
-(define-key 'azbyn/edit-map (kbd "a c") 'azbyn/edit-awesome-config)
-(define-key 'azbyn/edit-map (kbd "a t") 'azbyn/edit-awesome-theme)
-(define-key 'azbyn/edit-map (kbd "a w") 'azbyn/edit-awesome-widgets)
+  (define-key 'azbyn/edit-map (kbd "a r") 'azbyn/edit-awesome-rc)
+  (define-key 'azbyn/edit-map (kbd "a k") 'azbyn/edit-awesome-keybindings)
+  (define-key 'azbyn/edit-map (kbd "a u") 'azbyn/edit-awesome-utils)
+  (define-key 'azbyn/edit-map (kbd "a c") 'azbyn/edit-awesome-config)
+  (define-key 'azbyn/edit-map (kbd "a t") 'azbyn/edit-awesome-theme)
+  (define-key 'azbyn/edit-map (kbd "a w") 'azbyn/edit-awesome-widgets)
 
-(define-key 'azbyn/edit-map (kbd "d m") 'azbyn/dotfile-make)
-
+  (define-key 'azbyn/edit-map (kbd "d m") 'azbyn/dotfile-make)
+  )
 
 
 (define-key 'azbyn-key-map (kbd "C-c") 'config-visit)
@@ -305,7 +315,7 @@
 ;; *** spell checking bindings
 (define-prefix-command 'azbyn/spellcheck-map)
 
-(define-key 'azbyn-key-map (kbd "S") azbyn/spellcheck-map)
+(define-key 'azbyn-key-map (kbd "S") 'azbyn/spellcheck-map)
 
 (define-key 'azbyn/spellcheck-map (kbd "b") 'flyspell-buffer)
 (define-key 'azbyn/spellcheck-map (kbd "B") 'ispell-buffer)
@@ -317,7 +327,9 @@
 ;; *** input methods
 (define-prefix-command 'azbyn/input-method-map)
 
-(define-key 'azbyn-key-map (kbd "C-\\") azbyn/input-method-map)
+(define-key 'azbyn-key-map (kbd "C-\\") 'azbyn/input-method-map)
+
+(defun azbyn/set-input-old-romanian() (interactive) (set-input-method "old-romanian"))
 
 (defun azbyn/set-input-russian() (interactive) (set-input-method "azbyn-russian-translit"))
 (defun azbyn/set-input-azbyn-tex() (interactive) (set-input-method "azbyn-TeX"))
@@ -326,6 +338,7 @@
 (defun azbyn/set-input-katakana() (interactive) (set-input-method "japanese-katakana"))
 (defun azbyn/set-input-japanese() (interactive) (set-input-method "japanese"))
 
+(define-key 'azbyn/input-method-map (kbd "o") 'azbyn/set-input-old-romanian)
 (define-key 'azbyn/input-method-map (kbd "r") 'azbyn/set-input-russian)
 (define-key 'azbyn/input-method-map (kbd "t") 'azbyn/set-input-azbyn-tex)
 (define-key 'azbyn/input-method-map (kbd "T") 'azbyn/set-input-tex)
@@ -340,6 +353,8 @@
 
 (define-prefix-command 'diff-key-map)
 (define-key 'azbyn-key-map (kbd "d") 'diff-key-map)
+
+(define-key 'azbyn-key-map (kbd "c") 'azbyn/cyrillic-preview-mode)
 
 (define-key 'diff-key-map (kbd "a") 'diff-region)
 (define-key 'diff-key-map (kbd "b") 'diff-region-now)
@@ -819,6 +834,8 @@
 (global-set-key (kbd "M-0") 'end-of-buffer)
 ;; ** disable the binding in org mode and magit
 (define-key org-mode-map (kbd "<C-tab>") nil)
+(define-key org-mode-map (kbd "C-'") nil)
+
 (when (boundp 'magit-status-mode-map)
   (define-key magit-status-mode-map (kbd "<C-tab>") nil))
 

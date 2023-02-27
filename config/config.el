@@ -1,3 +1,4 @@
+;; (local-set-key (kbd "M-c") 'org-latex-export-to-pdf)
 ;; * lexical bindings
 ;; We have to leave this as the first line
 (setq lexical-binding t)
@@ -9,6 +10,155 @@
 
 (defvar azbyn/font (if azbyn/windows-mode "Consolas" "DejaVu Sans Mono"))
 
+(set-fontset-font t '(?Ꙁ . ?ꙮ) "Fira Slav")
+(set-fontset-font t '(?꙯ . ?ꚟ) "Fira Slav")
+(set-fontset-font t '(?ⷠ . ?ⷿ) "Fira Slav")
+(set-fontset-font t '(?ᲀ . ?ᲈ) "Fira Slav")
+(set-fontset-font t '(?Ѡ . ?҉) "Fira Slav")
+(set-fontset-font t ?̾  "Fira Slav")
+(set-fontset-font t ?̆  "Fira Slav")
+(set-fontset-font t ?і "Fira Slav")
+
+(set-fontset-font t '(?Ѐ . ?Џ) "Fira Slav")
+(set-fontset-font t '(?ѐ . ?џ) "Fira Slav")
+
+(set-fontset-font t '(?А . ?я) "Fira Slav")
+
+;; (defun azbyn/transliterate-face ()
+;;   (interactive)
+
+;;   (font-lock-add-keywords
+;;    'org-mode `(("\\(ш\\)"
+;;                 (0 (progn (compose-region (match-beginning 1)
+;;                                           (match-end 1) "ș")
+;;                           nil)))))
+;;   )
+
+
+(use-package hide-mode-line
+  :ensure t)
+
+
+(defun azbyn/redo-cyrillic-font ()
+  (interactive)
+  (set-fontset-font nil '(?Ѐ . ?ӿ) "Monomakh Unicode")
+  (set-fontset-font nil '(?Ꙁ . ?ꚟ) "Monomakh Unicode")
+  (set-fontset-font nil '(?ᲀ . ?ᲈ) "Monomakh Unicode")
+  )
+(defun azbyn/redo-cyrillic-font-ponomar ()
+  (interactive)
+  (set-fontset-font nil '(?Ѐ . ?ӿ) "Ponomar Unicode")
+  (set-fontset-font nil '(?Ꙁ . ?ꚟ) "Ponomar Unicode")
+  (set-fontset-font nil '(?ᲀ . ?ᲈ) "Ponomar Unicode")
+  )
+
+(define-minor-mode azbyn/cyrillic-preview-mode
+  "Use a different font for the current frame."
+  :init-value nil
+  :global nil
+
+  (let* ((enabled azbyn/cyrillic-preview-mode)
+         (frame (selected-frame))
+         (font-name (if enabled
+                        "Monomakh Unicode"
+                      azbyn/font
+                      ))
+         (font-name-cyr (if enabled
+                            "Monomakh Unicode"
+                          "Fira Slav"
+                          ))
+         (height (if enabled 160 100))
+        )
+    (select-frame frame)
+    (set-frame-font font-name)
+
+    (set (make-local-variable 'scroll-margin) (if enabled 1 3))
+
+    (message font-name-cyr)
+    ;; (format "%s %d" font-name font-size))
+
+    ;; (set-fontset-font nil '(?Ѐ . ?ӿ) "Monomakh Unicode")
+    ;; (set-fontset-font nil '(?Ꙁ . ?ꚟ) "Monomakh Unicode")
+    ;; (set-fontset-font nil '(?ᲀ . ?ᲈ) "Monomakh Unicode")
+    
+    (set-fontset-font nil '(?Ѐ . ?ӿ) font-name-cyr);cyrillic
+    (set-fontset-font nil '(?ⷠ . ?ⷿ) font-name-cyr);extended a
+    (set-fontset-font nil '(?Ꙁ . ?ꚟ) font-name-cyr);extended b
+    (set-fontset-font nil '(?ᲀ . ?ᲈ) font-name-cyr);extended c
+    ;; (text-scale-increase 2)
+
+    (set-face-attribute 'default frame :height height)
+    (setq line-spacing (if enabled 0.3 0))
+    ;; (if enabled
+    ;;     (turn-on-hide-mode-line-mode)
+    ;;   (turn-off-hide-mode-line-mode))
+
+    )
+  )
+
+(add-hook 'quail-activate-hook 'azbyn/old-romanian-extra-enable)
+(add-hook 'quail-deactivate-hook 'azbyn/old-romanian-extra-disable)
+
+(setq-default
+ quail-simple-translation-keymap
+ (let ((map (make-keymap))
+       (i 0))
+   (while (< i ?\ )
+     (define-key map (char-to-string i) 'quail-other-command)
+     (setq i (1+ i)))
+   (while (< i 127)
+     (define-key map (char-to-string i) 'quail-self-insert-command)
+     (setq i (1+ i)))
+   (setq i 128)
+   (while (< i 256)
+     (define-key map (vector i) 'quail-self-insert-command)
+     (setq i (1+ i)))
+   (define-key map "\177" 'quail-delete-last-char)
+   ;; (define-key map [delete] 'quail-delete-last-char)
+   (define-key map [backspace] 'quail-delete-last-char)
+   ;;(let ((meta-map (make-sparse-keymap)))
+   ;;(define-key map (char-to-string meta-prefix-char) meta-map)
+   ;;(define-key map [escape] meta-map))
+   map))
+
+
+(defun azbyn/cyrillic-preview-create ()
+  (interactive)
+  (let ((frame (make-frame)))
+    (select-frame frame)
+    (azbyn/cyrillic-preview-mode 1))
+  )
+
+(require 'flycheck)
+
+(flycheck-define-checker rom-cyr-check-accents
+  "Check romanian cyrillic diacritics"
+  :command ("py" "/home/azbyn/Projects/Disertatie/checker/checker.py"
+            source
+            ;; We must stay in the same directory to resolve @include
+            ;; source-inplace
+            )
+  :error-patterns
+  ((warning line-start (file-name) ":" line ":" column
+            ": warning: " (message) line-end)
+   (error line-start (file-name) ":" line ":" column
+          ": error: " (message) line-end))
+  :modes (text-mode org-mode))
+
+(add-hook 'org-mode-hook 'flycheck-mode)
+
+;; * setup the path
+(when (file-exists-p "~/.emacs.d/lisp/")
+  (add-to-list 'load-path "~/.emacs.d/lisp/")
+  ;;add all subdirs from ~/.emacs.d/lisp/
+  (let ((default-directory  "~/.emacs.d/lisp/"))
+    (normal-top-level-add-subdirs-to-load-path)))
+
+(when (file-exists-p "~/.emacs.d/themes/")
+  (add-to-list 'load-path "~/.emacs.d/themes/")
+  ;;add all subdirs from ~/.emacs.d/lisp/
+  (let ((default-directory  "~/.emacs.d/themes/"))
+    (normal-top-level-add-subdirs-to-load-path)))
 
 ;; * old - emacs ng thing
 ;; emacs-ng throws A LOT of warnings, most of which are the package
@@ -53,23 +203,26 @@
   )
 ;; * Theme
 ;; ** colors
-(defconst base16-col-base00 "#1D1F21")
-(defconst base16-col-base01 "#282A2E")
-(defconst base16-col-base02 "#373B41")
-(defconst base16-col-base03 "#7E807E")
-(defconst base16-col-base04 "#B4B7B4")
-(defconst base16-col-base05 "#C5C8C6")
-(defconst base16-col-base06 "#E0E0E0")
-(defconst base16-col-base07 "#FFFFFF")
-(defconst base16-col-base08 "#CC342B")
-(defconst base16-col-base09 "#F96A38")
-(defconst base16-col-base0A "#FBA922")
-(defconst base16-col-base0B "#198844")
-(defconst base16-col-base0C "#3971ED")
+(require 'base16-azbyn-google-dark-theme)
+(defconst azbyn-base16-colors base16-azbyn-google-dark-colors)
+
+(defconst base16-col-base00 (plist-get azbyn-base16-colors :base00))
+(defconst base16-col-base01 (plist-get azbyn-base16-colors :base01))
+(defconst base16-col-base02 (plist-get azbyn-base16-colors :base02))
+(defconst base16-col-base03 (plist-get azbyn-base16-colors :base03))
+(defconst base16-col-base04 (plist-get azbyn-base16-colors :base04))
+(defconst base16-col-base05 (plist-get azbyn-base16-colors :base05))
+(defconst base16-col-base06 (plist-get azbyn-base16-colors :base06))
+(defconst base16-col-base07 (plist-get azbyn-base16-colors :base07))
+(defconst base16-col-base08 (plist-get azbyn-base16-colors :base08))
+(defconst base16-col-base09 (plist-get azbyn-base16-colors :base09))
+(defconst base16-col-base0A (plist-get azbyn-base16-colors :base0A))
+(defconst base16-col-base0B (plist-get azbyn-base16-colors :base0B))
+(defconst base16-col-base0C (plist-get azbyn-base16-colors :base0C))
 ;; (defconst base16-col-base0C )
-(defconst base16-col-base0D "#3971ED")
-(defconst base16-col-base0E "#A36AC7")
-(defconst base16-col-base0F "#FBA922")
+(defconst base16-col-base0D (plist-get azbyn-base16-colors :base0D))
+(defconst base16-col-base0E (plist-get azbyn-base16-colors :base0E))
+(defconst base16-col-base0F (plist-get azbyn-base16-colors :base0F))
 
 (defvaralias 'base16-col-black   'base16-col-base00)
 (defvaralias 'base16-col-gray    'base16-col-base05)
@@ -83,32 +236,47 @@
 (defvaralias 'base16-col-magenta 'base16-col-base0E)
 
 ;; ** the base16 theme
+(add-to-list 'custom-theme-load-path "~/.emacs/themes")
+
 (use-package base16-theme
   :ensure t
-  :init
-  (setq-default base16-google-dark-colors
-                `(:base00 ,base16-col-base00
-                  :base01 ,base16-col-base01
-                  :base02 ,base16-col-base02
-                  :base03 ,base16-col-base03
-                  :base04 ,base16-col-base04
-                  :base05 ,base16-col-base05
-                  :base06 ,base16-col-base06
-                  :base07 ,base16-col-base07
-                  :base08 ,base16-col-base08
-                  :base09 ,base16-col-base09
-                  :base0A ,base16-col-base0A
-                  :base0B ,base16-col-base0B
-                  :base0C ,base16-col-base0C
-                  :base0D ,base16-col-base0D
-                  :base0E ,base16-col-base0E
-                  :base0F ,base16-col-base0F))
+ ;; :init
+ ;; (setq-default base16-google-dark-colors
+ ;;               `(:base00 ,base16-col-base00
+ ;;                 :base00 ,base16-col-base01
+ ;;                 :base02 ,base16-col-base02
+ ;;                 :base03 ,base16-col-base03
+ ;;                 :base04 ,base16-col-base04
+ ;;                 :base05 ,base16-col-base05
+ ;;                 :base06 ,base16-col-base06
+ ;;                 :base07 ,base16-col-base07
+ ;;                 :base08 ,base16-col-base08
+ ;;                 :base09 ,base16-col-base09
+ ;;                 :base0A ,base16-col-base0A
+ ;;                 :base0B ,base16-col-base0B
+ ;;                 :base0C ,base16-col-base0C
+ ;;                 :base0D ,base16-col-base0D
+ ;;                 :base0E ,base16-col-base0E
+ ;;                 :base0F ,base16-col-base0F))
   :config
   (setq-default base16-theme-256-color-source "base16-shell")
-  (load-theme 'base16-google-dark t)
+  (load-theme 'base16-azbyn-google-dark t)
   (unless (display-graphic-p)
-    (set-face-background 'default "unspecified-bg" (selected-frame)))
+    '(set-face-background 'default "unspecified-bg" (selected-frame)))
   )
+
+(defun azbyn/ah-my-eyes ()
+  (interactive)
+  (load-theme 'base16-azbyn-google-light t))
+
+(defun azbyn/light-theme ()
+  (interactive)
+  (azbyn/ah-my-eyes))
+(defun azbyn/dark-theme ()
+  (interactive)
+  (load-theme 'base16-azbyn-google-dark t))
+
+
 ;; ** ansi colors
 (setq-default ansi-color-names-vector
               (vector base16-col-black
@@ -258,8 +426,6 @@
 ;; ** no more typing =yes=
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-;; ** don't clutter things with backup files
-
 (defvar backup-dir (expand-file-name "~/.emacs.d/backup/"))
 (defvar autosave-dir (expand-file-name "~/.emacs.d/autosave/"))
 (setq backup-directory-alist (list (cons ".*" backup-dir)))
@@ -270,6 +436,7 @@
 (setq scroll-conservatively 999
       scroll-margin 3
       scroll-step 1)
+
 
 ;; ** no bell
 (setq ring-bell-function 'ignore)
@@ -354,12 +521,7 @@
 
 ;; ** dired directories first
 (setq dired-listing-switches "-al --group-directories-first")
-;; * setup the path
-(when (file-exists-p "~/.emacs.d/lisp/")
-  (add-to-list 'load-path "~/.emacs.d/lisp/")
-  ;;add all subdirs from ~/.emacs.d/lisp/
-  (let ((default-directory  "~/.emacs.d/lisp/"))
-    (normal-top-level-add-subdirs-to-load-path)))
+
 
 ;; * non-melpa packages
 ;; ** move line
@@ -592,6 +754,7 @@
 
 ;; * Org mode
 ;; ** macro for emacs-lisp
+;; (local-set-key (kbd "M-c") 'org-latex-export-to-pdf)
 (if (version< org-version "9.2")
     (add-to-list 'org-structure-template-alist
                  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
@@ -718,8 +881,8 @@ Repeated invocations toggle between the two most recently open buffers."
       ;; can return (the first letter of)
       ;;Letter, Mark, Number, Punctuation, Symbol, Separator, C (other)
       (let ((type (get-char-code-property c 'general-category)))
-        ;;make digits and _ behave like letters
-        (if (or (equal type 'Nd) (equal c ?_))
+        ;;make digits, combining characters and _ behave like letters
+        (if (or (equal type 'Nd) (equal type 'Mn) (equal c ?_))
             ?L
             (string-to-char (symbol-name type)))))))
 (defun azbyn/elisp-char-type (c)
@@ -1184,8 +1347,8 @@ Repeated invocations toggle between the two most recently open buffers."
 (defun azbyn/compile-project-command (path)
   "create a compile command depending on the directory"
   (cond ((member path '("/" "/home/azbyn/Projects" "/home/azbyn")) nil)
-        ((member ".dub" (directory-files path))
-         (message "dub build --root '%s'" (directory-files path)))
+        ;; ((member ".dub" (directory-files path))
+         ;; (message "dub build --root '%s'" path)) ; (directory-files path)))
         ((member "Makefile" (directory-files path))
          (concat "make -C '" path "'"))
         (t (azbyn/compile-project-command (azbyn/updir path)))))
@@ -1209,7 +1372,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (let ((cc (azbyn/compile-project-command
              (azbyn/find-root (buffer-file-name)))))
     (if cc
-        (compile cc)
+        (progn
+          (message "compile: `%s` `%s`" cc (azbyn/find-root (buffer-file-name)))
+          (compile cc))
       ;;(message "thing")
       (azbyn/make-file)
       )))
@@ -1221,7 +1386,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (let ((cc (azbyn/compile-project-command
              (azbyn/find-root (buffer-file-name)))))
     (if cc
-        (compile cc)
+        (let ((default-directory (azbyn/find-root (buffer-file-name))))
+          (compile cc))
       ;;(message "thing")
       (azbyn/make-file)
       )))
@@ -1265,6 +1431,10 @@ Repeated invocations toggle between the two most recently open buffers."
                                               (setq display-line-numbers nil)))
   :config
   (global-undo-tree-mode 1))
+(defun azbyn/nuke-undo-tree ()
+  (interactive)
+  (setq buffer-undo-tree nil))
+
 
 ;; * ivy and counsel mode
 ;; ** smex for showing recent commands
@@ -1350,7 +1520,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (setq-default evil-insert-state-modes nil)
 
 ;; ** a nice cursor
-(setq-default evil-emacs-state-cursor '("#FBA923" box))
+(setq-default evil-emacs-state-cursor (list base16-col-yellow 'box))
 (blink-cursor-mode 0)
 
 ;; ** finaly enable evil
@@ -1403,7 +1573,9 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; * quail stuff
 (require 'russian-transl)
 (require 'azbyn-tex)
-(setq-default default-input-method "azbyn-TeX")
+(require 'old-romanian-quail)
+;; (setq-default default-input-method "azbyn-TeX")
+(setq-default default-input-method "old-romanian")
 
 ;; * programming languages config
 ;; ** common
@@ -1529,6 +1701,7 @@ Repeated invocations toggle between the two most recently open buffers."
 
 (bind-key "<C-M-tab>" 'azbyn/clang-format-region-or-buffer)
 ;; ** c-style
+
 (diminish 'company-dcd-mode)
 (diminish 'company-dcd-mode)
 (c-add-style "my-style"
@@ -1554,6 +1727,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (azbyn/local-defun azbyn/make-thing ()
     (interactive)
     (eval-buffer)
+    (setq tab-width 8)
     (message "Evaluated buffer"))
   (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc))
   )
@@ -1586,6 +1760,9 @@ Repeated invocations toggle between the two most recently open buffers."
   (use-package d-mode
     :ensure t)
 
+  (use-package flycheck-dmd-dub
+    :ensure t)
+  (add-hook 'd-mode-hook 'flycheck-dmd-dub-set-variables)
   (use-package company-dcd
     :ensure t
     :diminish abbrev-mode
@@ -1593,7 +1770,13 @@ Repeated invocations toggle between the two most recently open buffers."
 
   (add-hook 'd-mode-hook 'company-dcd-mode)
   (add-hook 'd-mode-hook 'flycheck-mode)
-  (setq flycheck-dmd-include-path '("~/.dub/packages/gtk-d-3.9.0/gtk-d/generated/gtkd"))
+  
+  ;; (setq flycheck-dmd-include-path
+  ;;       '("~/.dub/packages/gtk-d-3.9.0/gtk-d/generated/gtkd"
+  ;;         "~/.dub/packages/matplotlib-d-0.1.7/matplotlib-d/source/"))
+  ;; (setq flycheck-dmd-args '("-J" "~/.dub/packages/matplotlib-d-0.1.7/matplotlib-d/views/pyplot_functions.txt"))
+
+  (setq flycheck-dmd-args '())
   (add-hook 'd-mode-hook (lambda ()
                            (setq azbyn/goto-definition-function
                                  'company-dcd-goto-definition)
@@ -2004,6 +2187,9 @@ Repeated invocations toggle between the two most recently open buffers."
   )
 ;; ** octave
 (unless azbyn/windows-mode
+  (defun azbyn/octave-run-current-file ()
+    (interactive)
+    (azbyn/compile-file-with "octave"))
   (setq auto-mode-alist
         (cons '("\\.m$" . octave-mode) auto-mode-alist))
   (add-hook 'octave-mode-hook 'azbyn/octave-hook)
@@ -2014,6 +2200,8 @@ Repeated invocations toggle between the two most recently open buffers."
     (define-key octave-mode-map (kbd "<C-return>") 'octave-send-line)
     (define-key octave-mode-map (kbd "<M-return>") 'octave-send-defun)
     (define-key octave-mode-map (kbd "<M-S-return>") 'octave-send-block)
+    (local-set-key (kbd "M-c") 'azbyn/octave-run-current-file)
+    ;; (define-key octave-mode-map (kbd "M-c") 'octave-send-block)
     (define-key octave-mode-map (kbd "<C-S-return>") 'octave-send-block)
     (define-key octave-mode-map (kbd "C-c C-c") 'octave-send-buffer)
     ))
@@ -2049,9 +2237,6 @@ Repeated invocations toggle between the two most recently open buffers."
 ;; ** yaml
 (use-package yaml-mode
   :ensure t)
-;; ** canoe
-(setq auto-mode-alist
-      (cons '("\\.can$" . c-mode) auto-mode-alist))
 
 ;; ** c#
 ;; having syntax highlighting is enough
