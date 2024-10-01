@@ -38,6 +38,9 @@
 (use-package hide-mode-line
   :ensure t)
 
+;; (use-package lilypond-mode
+  ;; :ensure t)
+
 
 (defun azbyn/redo-cyrillic-font ()
   (interactive)
@@ -147,6 +150,113 @@
 
 (add-hook 'org-mode-hook 'flycheck-mode)
 
+(defvar azbyn/cyr-words-file-path "/home/azbyn/Projects/Disertatie/ocr_correction/all_words.txt")
+
+(defun azbyn/starts-with-uppercase (str)
+  (let ((first (substring str 0 1)))
+    (string= (upcase first) first)))
+
+(defun azbyn/cyr-str-distance (a b)
+  (+ (string-distance a b)
+      ;; (ucs-normalize-NFD-string a)
+                      ;; (ucs-normalize-NFD-string b))
+     (if (eq (azbyn/starts-with-uppercase a)
+             (azbyn/starts-with-uppercase b))
+         0 0.5)))
+
+(defun azbyn/cyr-get-closest-word (word-arg)
+  (with-temp-buffer
+    (insert-file-contents azbyn/cyr-words-file-path)
+    ;; (let list )
+    (let ((word (ucs-normalize-NFD-string word-arg))
+          (min-word nil)
+          (min-dist 999999))
+      (while (not (eobp))
+        (let* ((cur-line   ;; get the current line as a string
+               (buffer-substring-no-properties
+                (progn (beginning-of-line) (point))
+                (progn (end-of-line) (point))))
+               (dist (azbyn/cyr-str-distance word cur-line)))
+          
+          (when (< dist min-dist) ; because it's sorted by occurance, more common words are the first to be suggested
+            (setq min-word cur-line)
+            (setq min-dist dist)
+            )
+          )
+        (forward-line 1)
+        )
+      ;; min-word
+      (cons min-word min-dist)
+      )))
+
+(defun azbyn/cyr-to-lat (word)
+  (s-trim (shell-command-to-string (format "py /home/azbyn/Projects/Disertatie/common_python/to_romanian_latin.py '%s'" word))))
+
+(defun azbyn/cyr-prompt-replace-with-closest ()
+  (interactive)
+  (let* (;(read-answer-short t)
+         (start-point (save-excursion
+                        (progn
+                          (re-search-backward "^\\|[^[:alnum:]]")
+                          (unless (= (point)(point-at-bol))
+                            (forward-char 1))
+                           (point)) ))
+         (end-point  (save-excursion
+                       (progn
+                         (forward-char)
+                         (re-search-forward "$\\|[^[:alnum:]]")
+                         (unless (= (point)(point-at-eol))
+                            (forward-char -1))
+                         (point))))
+         (word (buffer-substring-no-properties start-point end-point))
+         (new-word-data (azbyn/cyr-get-closest-word word))
+         (new-word (car new-word-data))
+         (new-word-dist (cdr new-word-data)))
+    (if (yes-or-no-p (format "Replace %s with %s (%s - %d)?" (azbyn/cyr-to-lat word) new-word (azbyn/cyr-to-lat new-word) new-word-dist))
+        (progn
+          (delete-region start-point end-point)
+          (goto-char start-point)
+          (when (or (= (char-after) ?<) (= (char-after) ?>))
+            (delete-char 1))
+          (insert new-word)
+          (forward-char))
+      (progn
+        (forward-word 1)
+        (when (or (= (char-after) ?<) (= (char-after) ?>))
+          (delete-char 1))
+        )
+      )
+    
+    (backward-word 1);if current word is wrong, stay on it
+    (backward-char 1)
+    (forward-word 1);move to end
+    (flycheck-next-error)))
+
+(global-set-key (kbd "C-<return>") 'azbyn/cyr-prompt-replace-with-closest)
+
+(use-package flycheck-languagetool
+  :ensure t
+  :hook (LaTeX-mode . flycheck-languagetool-setup)
+  :init
+  (setq flycheck-languagetool-server-jar
+        "/home/azbyn/.local/share/LanguageTool-6.1/languagetool-server.jar")
+  ;; (setq flycheck-languagetool--spelling-rules
+  ;;       ("HUNSPELL_RULE" "HUNSPELL_RULE_AR" "MORFOLOGIK_RULE_AST"
+  ;;        "MORFOLOGIK_RULE_BE_BY" "MORFOLOGIK_RULE_BR_FR"
+  ;;        "MORFOLOGIK_RULE_CA_ES" "MORFOLOGIK_RULE_DE_DE"
+  ;;        "MORFOLOGIK_RULE_EL_GR" "MORFOLOGIK_RULE_EN" "MORFOLOGIK_RULE_EN_AU"o
+  ;;        "MORFOLOGIK_RULE_EN_CA" "MORFOLOGIK_RULE_EN_GB"
+  ;;        "MORFOLOGIK_RULE_EN_NZ" "MORFOLOGIK_RULE_EN_US"
+  ;;        "MORFOLOGIK_RULE_EN_ZA" "MORFOLOGIK_RULE_ES" "MORFOLOGIK_RULE_GA_IE"
+  ;;        "MORFOLOGIK_RULE_IT_IT" "MORFOLOGIK_RULE_LT_LT"
+  ;;        "MORFOLOGIK_RULE_ML_IN" "MORFOLOGIK_RULE_NL_NL"
+  ;;        "MORFOLOGIK_RULE_PL_PL" "MORFOLOGIK_RULE_RO_RO"
+  ;;        "MORFOLOGIK_RULE_RU_RU" "MORFOLOGIK_RULE_RU_RU_YO"
+  ;;        "MORFOLOGIK_RULE_SK_SK" "MORFOLOGIK_RULE_SL_SI"
+  ;;        "MORFOLOGIK_RULE_SR_EKAVIAN" "MORFOLOGIK_RULE_SR_JEKAVIAN"
+  ;;        "MORFOLOGIK_RULE_TL" "MORFOLOGIK_RULE_UK_UA" "SYMSPELL_RULE"))
+  )
+
 ;; * setup the path
 (when (file-exists-p "~/.emacs.d/lisp/")
   (add-to-list 'load-path "~/.emacs.d/lisp/")
@@ -171,6 +281,7 @@
 ;; (setq warning-minimum-level :emergency)
 
 ;; * compilation thing
+
 (push '("\\*compilation\\*" . (nil (reusable-frames . t))) display-buffer-alist)
 
 ;; * Windows mode
@@ -754,17 +865,45 @@
 
 ;; * Org mode
 ;; ** macro for emacs-lisp
-;; (local-set-key (kbd "M-c") 'org-latex-export-to-pdf)
+;; (local-set-key (kbd "M-c") 'orqg-latex-export-to-pdf)
 (if (version< org-version "9.2")
     (add-to-list 'org-structure-template-alist
                  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
   (require 'org-tempo)
+
+  (setf org-structure-template-alist (assoc-delete-all "c" org-structure-template-alist))
   (add-to-list 'org-structure-template-alist
                '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist
                '("p" . "src python"))
   (add-to-list 'org-structure-template-alist
-               '("py" . "src python")))
+               '("py" . "src python"))
+
+  (add-to-list 'org-structure-template-alist
+               '("c" . "chapter")
+               )
+  (add-to-list 'org-structure-template-alist
+               '("ce" . "center")
+               )
+  (add-to-list 'org-structure-template-alist
+               '("part" . "part")
+               )
+  (add-to-list 'org-structure-template-alist
+               '("f" . "footnote")
+               )
+  (add-to-list 'org-structure-template-alist
+               '("sc" . "subchapter"))
+  (add-to-list 'org-structure-template-alist
+               '("t" . "table"))
+  (add-to-list 'org-structure-template-alist
+               '("table" . "table"))
+  (add-to-list 'org-structure-template-alist
+               '("sch" . "subchapter"))
+  (add-to-list 'org-structure-template-alist
+               '("ch" . "chapter")
+               )
+
+  )
 ;; ** bullets
 (use-package org-bullets
   :ensure t
@@ -1569,6 +1708,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (load "server")
 (unless (server-running-p) (server-start))
 ;; )
+(require 'lilypond-mode)
 
 ;; * quail stuff
 (require 'russian-transl)
@@ -2008,12 +2148,24 @@ Repeated invocations toggle between the two most recently open buffers."
     (local-set-key (kbd "M-c") 'platformio-upload)
     (setq flycheck-clang-include-path
           (list
-           (expand-file-name "~/.platformio/packages/toolchain-atmelavr/avr/include/")
-           (expand-file-name "~/.platformio/packages/framework-arduino-avr/variants/atmega328pb/")
-           "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino/"))
+           (expand-file-name "~/.platformio/packages/framework-arduinoespressif32/cores/esp32/")
+           (expand-file-name "/home/azbyn/.platformio/packages/framework-arduinoespressif32/tools/sdk/include/freertos")
+           (expand-file-name "/home/azbyn/.platformio/packages/framework-arduinoespressif32/libraries/BluetoothSerial/src")
+           ;; (expand-file-name "/home/azbyn/.platformio/packages/framework-arduinoespressif32/libraries/BluetoothSerial/src")
+           ;; (expand-file-name "~/.platformiopackages/toolchain-atmelavr/avr/include/")
+           ;; (expand-file-name "~/.platformio/packages/framework-arduino-avr/variants/atmega328pb/")
+           ;; "/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino/"
+           "/home/azbyn/.platformio/packages/toolchain-xtensa32@2.50200.97/xtensa-esp32-elf/include/c++/5.2.0"
+           "/home/azbyn/.platformio/packages/toolchain-xtensa32@2.50200.97/lib/gcc/xtensa-esp32-elf/5.2.0/include"
+           "/home/azbyn/.platformio/packages/toolchain-xtensa32@2.50200.97/lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed"
+           "/home/azbyn/.platformio/packages/toolchain-xtensa32@2.50200.97/xtensa-esp32-elf/include"
+           "/home/azbyn/.platformio/packages/toolchain-xtensa32@2.50200.97/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf"
+           )
+          )
     (setq flycheck-clang-args '("-nostdinc++" "--target=avr"
                                 "-I/usr/share/arduino/hardware/archlinux-arduino/avr/cores/arduino/"
-                                )))
+                                ))
+    )
   (defun read-lines (filePath)
     "Return a list of lines of a file at filePath."
     (with-temp-buffer
@@ -2400,10 +2552,12 @@ Repeated invocations toggle between the two most recently open buffers."
 (setq org-confirm-babel-evaluate nil)
 (defun azbyn/org-hook ()
   ;; (message "oi")
+  (local-set-key (kbd "M-c") 'org-latex-export-to-pdf)
   (azbyn/local-defun azbyn/make-thing ()
     (interactive)
-    (local-set-key (kbd "M-c") 'org-latex-export-to-pdf)
     (org-latex-export-to-pdf))
+  (local-set-key (kbd "C-<return>") 'azbyn/cyr-prompt-replace-with-closest)
+  
   ;; (azbyn/local-defalias azbyn/make-thing 'org-latex-export-to-pdf)
   ;; (setq-local azbyn/make-thing-function )
   ;; (add-to-list 'org-latex-minted-langs '(ipython "python"))
@@ -2418,7 +2572,11 @@ Repeated invocations toggle between the two most recently open buffers."
       org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+;; * compilation mode
+(defun azbyn/compilation-mode-hook ()
+  (local-set-key (kbd "C-k") 'kill-compilation))
 
+(add-hook 'compilation-mode-hook 'azbyn/compilation-mode-hook)
 
 ;; * end
 (provide 'config)

@@ -835,6 +835,8 @@
 ;; ** disable the binding in org mode and magit
 (define-key org-mode-map (kbd "<C-tab>") nil)
 (define-key org-mode-map (kbd "C-'") nil)
+(define-key org-mode-map (kbd "C-<return>") nil); 'azbyn/cyr-prompt-replace-with-closest)
+
 
 (when (boundp 'magit-status-mode-map)
   (define-key magit-status-mode-map (kbd "<C-tab>") nil))
