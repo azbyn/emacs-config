@@ -1,5 +1,4 @@
 lisp/emacs-webkit
-*
 !.gitignore
 !init.el
 !themes/*
@@ -11,3 +10,15 @@ lisp/emacs-webkit
 !snippets/**/*
 !*.org
 !README.*
+autosave
+elpa
+elpy
+eshell
+irony
+recentf
+smex-items
+tramp
+undo
+transient
+workspace
+*
