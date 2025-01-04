@@ -3,7 +3,7 @@
   "Modified from base16-theme-define
  Define the faces for a base16 colorscheme given a
    `THEME-NAME' and a plist of `THEME-COLORS'."
-  (base16-set-faces
+  (base16-theme-set-faces
    theme-name
    theme-colors
 

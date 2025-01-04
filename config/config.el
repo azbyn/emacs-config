@@ -132,7 +132,10 @@
     (azbyn/cyrillic-preview-mode 1))
   )
 
-(require 'flycheck)
+(use-package flycheck
+  :ensure t)
+
+;; (require 'flycheck)
 
 (flycheck-define-checker rom-cyr-check-accents
   "Check romanian cyrillic diacritics"
@@ -314,6 +317,8 @@
   )
 ;; * Theme
 ;; ** colors
+(use-package base16-theme
+  :ensure t)
 (require 'base16-azbyn-google-dark-theme)
 (defconst azbyn-base16-colors base16-azbyn-google-dark-colors)
 
@@ -1708,7 +1713,7 @@ Repeated invocations toggle between the two most recently open buffers."
 (load "server")
 (unless (server-running-p) (server-start))
 ;; )
-(require 'lilypond-mode)
+;(require 'lilypond-mode)
 
 ;; * quail stuff
 (require 'russian-transl)
@@ -1892,9 +1897,9 @@ Repeated invocations toggle between the two most recently open buffers."
 (unless azbyn/windows-mode
   (require 'poetry-mode)
   (add-hook 'poetry-mode-hook 'display-line-numbers-mode))
-;; ** lambda
-(unless azbyn/windows-mode
-  (require 'lambda-mode))
+;;;; ** lambda
+;;(unless azbyn/windows-mode
+;;  (require 'lambda-mode))
 ;; ** dlang
 (unless azbyn/windows-mode
   (use-package d-mode
